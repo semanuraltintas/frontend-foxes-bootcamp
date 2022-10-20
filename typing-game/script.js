@@ -1,31 +1,83 @@
+const quotes = [
+  "Things are only impossible until they are not",
+  "It is possible to commit no errors and still lose. That is not a weakness. That is life",
+  "There is a way out of every box, a solution to every puzzle; it is just a matter of finding it.",
+  "Without freedom of choice there is no creativity",
+  "Logic is the beginning of wisdom, not the end",
+  "Improve a mechanical device and you may double productivity. But improve yourself, you gain a thousandfold",
+  "Compassion: that is the one thing no machine ever had. Maybe it is the one thing that keeps us ahead of them.",
+];
+
 const quote = document.getElementById("quote");
 const input = document.getElementById("typed-value");
 const start = document.getElementById("start");
+const message = document.getElementById("message");
 
 let wordQueue;
 let quoteText;
+let highlightPosition;
+let startTime;
 
 function startGame() {
-  console.log("Game Started!", "good luck");
+  console.log("Game Started!");
+  console.log(quotes.length);
 
-  quoteText = "Improve a mechical";
+  const quoteIndex = Math.floor(Math.random() * quotes.length);
+  // will return a random number from 1 to 7
+
+  quoteText = quotes[quoteIndex];
   wordQueue = quoteText.split(" ");
 
-  quote.innerHTML = wordQueue.map((word) => `<span>${word}</span>`).join(" ");
+  document.body.className = "";
+
+  message.innerHTML = "";
+
+  quote.innerHTML = wordQueue.map((word) => `<span>${word}</span>`).join("");
+
+  highlightPosition = 0;
+  quote.childNodes[highlightPosition].className = "highlight";
+
+  startTime = new Date().getTime();
+  setTimeout(() => {
+    start.className = "button";
+  }, 2000);
 }
 
 function checkInput() {
-  const currentWorld = targetWord;
-  const typedValue = input.value;
-  // console.log("no trim:", input.value, "with trim:", typedValue);
-  if (currentWorld !== typedValue) {
-    input.className = currentWorld.startsWith(typedValue) ? "" : "error";
+  // wordQueue[0] allows us to grab the first element in our wordQueue array using an array indexer
+  const currentWord = wordQueue[0].replaceAll(".", "").replaceAll(",", "");
+  const typedValue = input.value.trim();
+
+  if (currentWord !== typedValue) {
+    input.className = currentWord.startsWith(typedValue) ? "" : "error";
     return;
   }
+
   wordQueue.shift();
   input.value = "";
+
+  // highlightPosition = 0;
+  quote.childNodes[highlightPosition].className = "";
+  if (wordQueue.length === 0) {
+    gameOver();
+    return;
+  }
+
+  // highlightPosition = 0 + 1;
+  highlightPosition++;
+  quote.childNodes[highlightPosition].className = "highlight";
 }
 
-/* element.addEventListeners(even, function); */
+function gameOver() {
+  const elapsedTime = new Date().getTime() - startTime;
+  document.body.className = "Winner";
+
+  message.innerHTML = `
+        <span class="congrats">Congratulations!</span><br>
+        You finished in ${elapsedTime / 1000} seconds
+  `;
+}
+
+// element.addEventListener(event, function);
 input.addEventListener("input", checkInput);
 start.addEventListener("click", startGame);
